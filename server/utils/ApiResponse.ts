@@ -9,13 +9,15 @@ export class ApiResponse {
   status: 'success' | 'fail';
   message: string;
   statusCode: number;
-  data?: any;
+  data?: unknown;
+  meta?: unknown;
 
   constructor(statusCode: number, message: string, data: any = null) {
     this.status = statusCode < 400 ? 'success' : 'fail';
     this.message = message;
     this.statusCode = statusCode;
-    if (data) this.data = data;
+    if (data) this.data = data.data ? data.data : data;
+    if (data && data.meta) this.meta = data.meta;
   }
 
   /**
