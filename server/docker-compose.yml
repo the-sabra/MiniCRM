@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: minicrm-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=minicrm
+    networks:
+      - minicrm-network
+
+  server:
+    build: .
+    container_name: minicrm-server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017/minicrm
+      - JWT_SECRET=change_this_secret_in_production
+      - JWT_EXPIRATION=24h
+      - BASE_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+    networks:
+      - minicrm-network
+    restart: unless-stopped
+
+networks:
+  minicrm-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
