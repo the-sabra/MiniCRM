@@ -38,7 +38,14 @@ app.use(limiter);
 
 app.use(helmet());
 
+
+// Register routes
 app.use('/', routes);
+
+// make response in json if route not found
+app.use(( _req, res, _next) => {
+    res.status(404).json({ message: 'Route not found' });
+});
 
 // Error handler should be last
 app.use(errorHandler);

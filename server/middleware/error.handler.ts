@@ -19,7 +19,9 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
     res.status(statusCode).json(
         ApiResponse.error(
             statusCode,
-            err.message || 'Internal server error'
+            !err.messages?.[0] 
+            ? err.message : err.messages[0]
+            || 'Internal server error'
         )
     );
 };
