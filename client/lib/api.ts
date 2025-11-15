@@ -104,7 +104,7 @@ export const propertyApi = {
       const payload = {
         title: data.title,
         amount: {
-          price: Math.round(data.price * 100), // Convert to cents
+          price: Math.floor(data.price * 100), // Convert to cents
           currency: data.currency,
         },
         location: data.location,
@@ -125,7 +125,7 @@ export const propertyApi = {
       const payload = {
         title: data.title,
         amount: {
-          price: Math.round(data.price * 100), // Convert to cents
+          price: Math.floor(data.price * 100), // Convert to cents
           currency: data.currency,
         },
         location: data.location,

@@ -33,7 +33,7 @@ export const propertyFormSchema = z.object({
     .int('Bathrooms must be a whole number')
     .min(1, 'Must have at least 1 bathroom'),
   status: z.enum(['available', 'sold'], {
-    error: 'Status must be either "available" or "sold"',
+    error: 'Status must be either \"available\" or \"sold\"',
   }),
 });
 
