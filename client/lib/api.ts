@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { PropertyApiResponse, SinglePropertyApiResponse, PropertyFormData } from '@/types/property.types';
+import { PropertyApiResponse, SinglePropertyApiResponse, PropertyFormData, PropertyStatisticsApiResponse } from '@/types/property.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -145,6 +145,15 @@ export const propertyApi = {
   async delete(id: string): Promise<{ status: string; message: string }> {
     try {
       const response = await apiClient.delete<{ status: string; message: string }>(`/properties/${id}`);
+      return response.data;
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  async getStatistics(): Promise<PropertyStatisticsApiResponse> {
+    try {
+      const response = await apiClient.get<PropertyStatisticsApiResponse>(`/properties/statistics`);
       return response.data;
     } catch (error) {
       return handleApiError(error);

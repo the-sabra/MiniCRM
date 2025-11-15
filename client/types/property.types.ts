@@ -52,3 +52,29 @@ export interface ColumnConfig {
   visible: boolean;
   order: number;
 }
+
+// Statistics types
+export interface PropertyStatistics {
+  totalProperties: number;
+  // average price in cents per currency
+  averagePrice: {
+    EGP: number;
+    SAR: number;
+  };
+  statusCount: {
+    available: number;
+    sold: number;
+  };
+  locationStats: Array<{
+    location: string;
+    averageBedrooms: number;
+    averageBathrooms: number;
+  }>;
+}
+
+export interface PropertyStatisticsApiResponse {
+  status: 'success' | 'fail';
+  message: string;
+  statusCode: number;
+  data: PropertyStatistics;
+}

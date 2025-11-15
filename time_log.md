@@ -7,3 +7,8 @@
 # Frontend UI and build the page : 2h
 
 # Add Pagination: 30m
+
+
+# Add Statistics API: 30m
+
+# Frontend Statistics Page: 2h

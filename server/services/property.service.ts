@@ -37,7 +37,7 @@ class PropertyService {
             const skip = (filters.page - 1) * filters.take;
             
             const [properties, total] = await Promise.all([
-                Property.find(query).skip(skip).limit(filters.take).exec(),
+                Property.find(query).skip(skip).limit(filters.take).sort({ createdAt: -1 }).exec(),
                 Property.countDocuments(query).exec(),
             ]);
 
@@ -72,6 +72,116 @@ class PropertyService {
         }
         logger.info(`Property with id ${id} deleted successfully:`);
         return deletedProperty;
+    }
+
+    public async getStatisticsProperty(): Promise<
+    { totalProperties: number , 
+      averagePrice:{
+        EGP: number,
+        SAR: number,
+      } , 
+      statusCount: {
+        available: number;
+        sold: number;
+      }
+      locationStats: {
+        location: string;
+        averageBedrooms: number;
+        averageBathrooms: number;
+      }[]
+    }> {
+        try {
+
+            const overallStats = await Property.aggregate([
+                {
+                    $facet: {
+                        total: [
+                            {
+                                $group: {
+                                    _id: null,
+                                    totalProperties: { $sum: 1 }
+                                }
+                            }
+                        ],
+                        averagePrice: [
+                            {
+                                $group:{
+                                    _id: "$amount.currency",
+                                    averagePrice: { $avg: '$amount.price' }
+                                }
+                            }
+                        ],
+                        statusCount: [
+                            {
+                                $group: {
+                                    _id: '$status',
+                                    count: { $sum: 1 }
+                                }
+                            }
+                        ],
+                        locationStats: [
+                            {
+                                $group: {
+                                    _id: '$location',
+                                    averageBedrooms: { $avg: '$bedrooms' },
+                                    averageBathrooms: { $avg: '$bathrooms' }
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 0,
+                                    location: '$_id',
+                                    averageBedrooms: { $round: ['$averageBedrooms', 2] },
+                                    averageBathrooms: { $round: ['$averageBathrooms', 2] }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]);
+
+            const result = overallStats[0];
+            
+            const totalProperties = result.total[0]?.totalProperties || 0;
+            let averagePrice = { EGP: 0, SAR: 0 };
+            result.averagePrice.forEach((priceObj: { _id: string; averagePrice: number }) => {
+                if (priceObj._id === 'EGP') {
+                    averagePrice.EGP = priceObj.averagePrice;
+                }else if(priceObj._id === 'SAR'){
+                    averagePrice.SAR = priceObj.averagePrice;
+                }
+            });
+
+            const statusCount = {
+                available: 0,
+                sold: 0
+            };
+
+
+            result.statusCount.forEach((status: { _id: string; count: number }) => {
+                if (status._id === 'available') {
+                    statusCount.available = status.count;
+                } else if (status._id === 'sold') {
+                    statusCount.sold = status.count;
+                }
+            });
+
+            
+
+            const locationStats = result.locationStats || [];
+
+            logger.info('Property statistics fetched successfully');
+
+            return {
+                totalProperties,
+                averagePrice,
+                statusCount,
+                locationStats
+            };
+        } catch (error) {
+            logger.error('Error fetching property statistics:', error);
+            throw new AppError('Failed to fetch property statistics', 500);
+        }
     }
 }
 
