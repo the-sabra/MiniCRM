@@ -60,8 +60,8 @@ export const usePropertyStore = create<PropertyState>((set, get) => ({
 
       if (response.status === 'success' && response.data) {
         set({
-          properties: response.data.data,
-          meta: response.data.meta || null,
+          properties: response.data,
+          meta: response.meta || null,
           loading: false,
         });
       } else {

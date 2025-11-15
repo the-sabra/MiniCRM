@@ -12,11 +12,9 @@ export const propertyFormSchema = z.object({
     })
     .positive('Price must be a positive number')
     .min(0.01, 'Price must be at least $0.01'),
-  currency: z
-    .string()
-    .length(3, 'Currency must be a 3-character ISO code (e.g., USD, EUR)')
-    .toUpperCase()
-    .regex(/^[A-Z]{3}$/, 'Currency must contain only letters'),
+  currency: z.enum(['EGP', 'SAR'], {
+    error: 'Currency must be either EGP or SAR',
+  }),
   location: z
     .string()
     .min(5, 'Location must be at least 5 characters')

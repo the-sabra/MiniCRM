@@ -1,5 +1,5 @@
 export interface Property {
-  _id: string;
+  id: string;
   title: string;
   amount: {
     price: number; // in cents
@@ -27,7 +27,6 @@ export interface PropertyApiResponse {
   status: 'success' | 'fail';
   message: string;
   statusCode: number;
-  data?: {
     data: Property[];
     meta?: {
       totalItems: number;
@@ -36,7 +35,6 @@ export interface PropertyApiResponse {
       totalPages: number;
       currentPage: number;
     };
-  };
 }
 
 export interface SinglePropertyApiResponse {
