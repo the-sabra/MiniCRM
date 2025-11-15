@@ -8,6 +8,12 @@ import {
   Stack,
   Dialog,
   Portal,
+  ButtonGroup,
+  IconButton,
+  Pagination,
+  NativeSelect,
+  Text,
+  Flex,
 } from '@chakra-ui/react';
 import { usePropertyStore } from '@/lib/stores/property.store';
 import { PropertyTable } from '@/components/properties/PropertyTable';
@@ -68,12 +74,17 @@ export default function PropertiesPage() {
   const {
     properties,
     loading,
+    meta,
+    currentPage,
+    itemsPerPage,
     searchQuery,
     fetchProperties,
     createProperty,
     updateProperty,
     deleteProperty,
     setSearchQuery,
+    setPage,
+    setItemsPerPage,
   } = usePropertyStore();
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => loadColumnsFromStorage());
@@ -202,6 +213,79 @@ export default function PropertiesPage() {
           onDelete={handleDeleteProperty}
           onColumnReorder={handleColumnReorder}
         />
+
+        {/* Pagination Controls */}
+        <Flex
+          align={{ base: 'stretch', md: 'center' }}
+          justify="space-between"
+          direction={{ base: 'column', md: 'row' }}
+          gap={3}
+        >
+          {/* Rows per page (mobile) */}
+          <Stack
+            direction={{ base: 'column', sm: 'row' }}
+            align={{ base: 'stretch', sm: 'center' }}
+            gap={2}
+            w={{ base: 'full', md: 'auto' }}
+          >
+            <Text color="gray.600" display={{ base: 'none', sm: 'inline' }}>
+              Rows per page
+            </Text>
+            <Text color="gray.600" display={{ base: 'inline', sm: 'none' }}>
+              Rows
+            </Text>
+            <NativeSelect.Root size="sm" width={{ base: 'full', sm: '120px' }}>
+              <NativeSelect.Field
+                value={String(itemsPerPage)}
+                onChange={(e) => setItemsPerPage(parseInt(e.currentTarget.value))}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </NativeSelect.Field>
+              <NativeSelect.Indicator />
+            </NativeSelect.Root>
+          </Stack>
+
+          {/* Paginator (mobile) */}
+          <Pagination.Root
+            count={meta?.totalItems ?? 0}
+            pageSize={itemsPerPage}
+            page={currentPage}
+            onPageChange={(e) => setPage(e.page)}
+            w={{ base: 'full', md: 'auto' }}
+          >
+            <ButtonGroup
+              variant="ghost"
+              size="sm"
+              display="flex"
+              justifyContent={{ base: 'space-between', md: 'flex-end' }}
+              flexWrap="wrap"
+              gap={2}
+              w="full"
+            >
+              <Pagination.PageText
+                format="compact"
+                display={{ base: 'inline', md: 'none' }}
+              />
+              <Pagination.PageText
+                format="long"
+                display={{ base: 'none', md: 'inline' }}
+              />
+              <Pagination.PrevTrigger asChild>
+                <IconButton aria-label="Previous page" minW="auto">
+                  ‹
+                </IconButton>
+              </Pagination.PrevTrigger>
+              <Pagination.NextTrigger asChild>
+                <IconButton aria-label="Next page" minW="auto">
+                  ›
+                </IconButton>
+              </Pagination.NextTrigger>
+            </ButtonGroup>
+          </Pagination.Root>
+        </Flex>
 
         {/* Add/Edit Property Dialog */}
         <Dialog.Root
