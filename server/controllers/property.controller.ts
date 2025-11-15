@@ -47,6 +47,20 @@ class PropertyController {
             next(error);
         }
     }
+
+    static async statisticsProperty(_req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const statistics = await propertyService.getStatisticsProperty();
+            return res.status(200).json(
+                new ApiResponse(200,
+                    'Property Statistics',
+                    statistics
+                )
+            )
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 

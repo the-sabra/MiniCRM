@@ -11,5 +11,5 @@ router.post('/',validate(validateType.BODY, createPropertySchema),PropertyContro
 router.get('/',validate(validateType.QUERY, filterPropertySchema), PropertyController.getAllProperties);
 router.put('/:id', validate(validateType.PARAMS, MongoIDSchema), validate(validateType.BODY, createPropertySchema), PropertyController.updateProperty);
 router.delete('/:id',validate(validateType.PARAMS, MongoIDSchema), PropertyController.deleteProperty);
-
+router.get('/statistics', PropertyController.statisticsProperty);
 export default router;
