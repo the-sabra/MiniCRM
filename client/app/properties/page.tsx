@@ -14,7 +14,9 @@ import {
   NativeSelect,
   Text,
   Flex,
+  Button,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { usePropertyStore } from '@/lib/stores/property.store';
 import { PropertyTable } from '@/components/properties/PropertyTable';
 import { TableControls } from '@/components/properties/TableControls';
@@ -186,12 +188,19 @@ export default function PropertiesPage() {
       <Stack gap={6}>
         {/* Page Header */}
         <Box>
-          <Heading size="2xl" mb={2}>
-            Property Management
-          </Heading>
-          <Box color="gray.600">
-            Manage your property listings
-          </Box>
+          <Flex justify="space-between" align={{ base: 'stretch', md: 'center' }} direction={{ base: 'column', md: 'row' }} gap={3}>
+            <Box>
+              <Heading size="2xl" mb={2}>
+                Property Management
+              </Heading>
+              <Box color="gray.600">
+                Manage your property listings
+              </Box>
+            </Box>
+            <NextLink href="/properties/statistics">
+              <Button variant="solid" colorPalette="blue">View Statistics</Button>
+            </NextLink>
+          </Flex>
         </Box>
 
         {/* Table Controls */}

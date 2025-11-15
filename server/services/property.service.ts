@@ -76,7 +76,10 @@ class PropertyService {
 
     public async getStatisticsProperty(): Promise<
     { totalProperties: number , 
-      averagePrice:number , 
+      averagePrice:{
+        EGP: number,
+        SAR: number,
+      } , 
       statusCount: {
         available: number;
         sold: number;
@@ -92,12 +95,19 @@ class PropertyService {
             const overallStats = await Property.aggregate([
                 {
                     $facet: {
-                        totalAndAverage: [
+                        total: [
                             {
                                 $group: {
                                     _id: null,
-                                    totalProperties: { $sum: 1 },
-                                    averagePrice: { $avg: '$price' }
+                                    totalProperties: { $sum: 1 }
+                                }
+                            }
+                        ],
+                        averagePrice: [
+                            {
+                                $group:{
+                                    _id: "$amount.currency",
+                                    averagePrice: { $avg: '$amount.price' }
                                 }
                             }
                         ],
@@ -131,9 +141,16 @@ class PropertyService {
             ]);
 
             const result = overallStats[0];
-
-            const totalProperties = result.totalAndAverage[0]?.totalProperties || 0;
-            const averagePrice = result.totalAndAverage[0]?.averagePrice || 0;
+            
+            const totalProperties = result.total[0]?.totalProperties || 0;
+            let averagePrice = { EGP: 0, SAR: 0 };
+            result.averagePrice.forEach((priceObj: { _id: string; averagePrice: number }) => {
+                if (priceObj._id === 'EGP') {
+                    averagePrice.EGP = priceObj.averagePrice;
+                }else if(priceObj._id === 'SAR'){
+                    averagePrice.SAR = priceObj.averagePrice;
+                }
+            });
 
             const statusCount = {
                 available: 0,
@@ -149,13 +166,15 @@ class PropertyService {
                 }
             });
 
+            
+
             const locationStats = result.locationStats || [];
 
             logger.info('Property statistics fetched successfully');
 
             return {
                 totalProperties,
-                averagePrice: Math.round(averagePrice * 100) / 100,
+                averagePrice,
                 statusCount,
                 locationStats
             };
