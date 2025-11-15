@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev:bun": "bun --watch server.ts",
+    "start:bun": "bun run server.ts",
     "dev": "tsx watch server.ts",
     "build": "tsc",
     "start": "node dist/server.js",

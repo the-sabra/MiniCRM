@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: minicrm-mongo
+    environment:
+      MONGO_INITDB_DATABASE: minicrm
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - minicrm-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../server/
+      dockerfile: Dockerfile
+    container_name: minicrm-api
+    ports:
+      - '3000:3000'
+    networks:
+      - minicrm-network
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env.server
+
+  frontend:
+    build:
+      context: ../client/
+      dockerfile: Dockerfile
+    container_name: minicrm-frontend
+    ports:
+      - '3001:3001'
+    networks:
+      - minicrm-network
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - .env.client
+
+networks:
+  minicrm-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
